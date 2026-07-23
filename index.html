@@ -14,7 +14,7 @@
   
   <style>
     :root {
-      --bg-surface: #e2e8f0; /* Cinza claro para destacar os cartões */
+      --bg-surface: #e2e8f0;
       --card-bg: #ffffff;
       --primary-color: #0f172a;
       --accent-color: #2563eb;
@@ -31,7 +31,6 @@
       flex-direction: column;
     }
 
-    /* Cabeçalho */
     .app-header {
       padding: 1rem 0 0.5rem;
     }
@@ -43,7 +42,6 @@
       color: var(--primary-color);
     }
 
-    /* Cartões Compactos com Dimensões Idênticas */
     .card-custom {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -55,7 +53,6 @@
       overflow: hidden;
     }
 
-    /* Formulário Estilizado */
     .form-label {
       font-size: 0.8rem;
       font-weight: 600;
@@ -80,7 +77,6 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
 
-    /* Área de Preview da Folha */
     .preview-wrapper {
       background-color: #cbd5e1;
       border-radius: 8px;
@@ -103,6 +99,11 @@
       border-radius: 2px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
       background-color: #ffffff;
+    }
+
+    /* Elemento de impressão exclusivo */
+    #print-container {
+      display: none;
     }
 
     .btn-action {
@@ -139,44 +140,39 @@
       color: var(--primary-color);
     }
 
-    /* Regras para Impressão em Folha Inteira */
+    /* --- REGRAS DE IMPRESSÃO --- */
     @page {
       size: A4 portrait;
       margin: 0;
     }
 
     @media print {
-      html, body {
-        width: 100vw;
-        height: 100vh;
-        margin: 0 !important;
-        padding: 0 !important;
-        background-color: #ffffff !important;
-        overflow: hidden;
+      /* Esconde absolutamente tudo do sistema da tela */
+      body * {
+        visibility: hidden !important;
       }
-      .no-print {
-        display: none !important;
+
+      /* Exibe apenas o container de impressão */
+      #print-container, #print-container * {
+        visibility: visible !important;
       }
-      .container-fluid, .row, [class*="col-"], .preview-wrapper, .card-custom {
-        width: 100% !important;
-        height: 100% !important;
-        max-width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        border: none !important;
-        box-shadow: none !important;
+
+      #print-container {
         display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        background-color: #ffffff !important;
-      }
-      canvas {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
-        max-height: 100vh !important;
-        object-fit: contain;
-        box-shadow: none !important;
-        border-radius: 0 !important;
+        justify-content: center !important;
+        align-items: center !important;
+        background: #ffffff !important;
+      }
+
+      #print-container img {
+        width: 100vw !important;
+        height: 100vh !important;
+        object-fit: contain !important;
       }
     }
   </style>
@@ -184,7 +180,7 @@
 <body>
 
   <!-- Cabeçalho -->
-  <header class="app-header no-print">
+  <header class="app-header">
     <div class="container-fluid px-4 text-center">
       <h1 class="app-title m-0">Gerador de Chapas</h1>
     </div>
@@ -192,11 +188,10 @@
 
   <!-- Conteúdo Principal -->
   <main class="container-fluid px-4 pb-3 flex-grow-1">
-    <!-- Linha centralizada com largura das colunas reduzida -->
     <div class="row g-4 align-items-stretch justify-content-center">
       
-      <!-- Container 1: Formulário (Largura reduzida) -->
-      <div class="col-xl-4 col-lg-5 col-md-6 no-print d-flex flex-column">
+      <!-- Container 1: Formulário -->
+      <div class="col-xl-4 col-lg-5 col-md-6 d-flex flex-column">
         <div class="card-custom p-4">
           <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
             <h2 class="h5 font-weight-bold m-0" style="font-size: 1.05rem; font-weight: 600;">Parâmetros do Layout</h2>
@@ -250,7 +245,7 @@
         </div>
       </div>
 
-      <!-- Container 2: Preview da Folha (Largura reduzida) -->
+      <!-- Container 2: Preview da Folha -->
       <div class="col-xl-4 col-lg-5 col-md-6 col-12 d-flex flex-column">
         <div class="card-custom p-3">
           <div class="preview-wrapper">
@@ -262,9 +257,15 @@
     </div>
   </main>
 
+  <!-- Area Isolada de Impressão -->
+  <div id="print-container">
+    <img id="print-image" alt="Folha de Impressão">
+  </div>
+
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const printImage = document.getElementById('print-image');
 
     // Elementos de entrada
     const inputMaterial = document.getElementById('material');
@@ -282,7 +283,7 @@
     customLogo.src = 'logo.png';
     customLogo.onload = () => render();
     customLogo.onerror = () => {
-      console.warn('Logo padrão "logo.png" não localizada na raiz. Exibindo indicador temporário.');
+      console.warn('Logo padrão "logo.png" não localizada na raiz.');
       render();
     };
 
@@ -295,7 +296,7 @@
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Estilo e Tipografia do Layout
+      // 2. Estilo e Tipografia
       ctx.fillStyle = '#0F172A';
       ctx.textAlign = 'center';
 
@@ -329,7 +330,6 @@
 
         ctx.drawImage(customLogo, logoX, logoY, logoWidth, logoHeight);
       } else {
-        // Marcador caso a logo não exista
         ctx.fillStyle = '#94A3B8';
         ctx.font = 'italic 18px "Inter", sans-serif';
         ctx.fillText('[ LOGO DA EMPRESA ]', width / 2, 720);
@@ -366,9 +366,12 @@
       link.click();
     });
 
-    // Ação: Imprimir
+    // Ação: Imprimir Isolado
     btnPrint.addEventListener('click', () => {
-      window.print();
+      printImage.src = canvas.toDataURL('image/png');
+      setTimeout(() => {
+        window.print();
+      }, 50);
     });
 
     // Renderização Inicial
