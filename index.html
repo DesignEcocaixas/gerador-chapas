@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Cartão de Especificação</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  
+  <style>
+    :root {
+      --bg-surface: #f4f6f9;
+      --card-bg: #ffffff;
+      --primary-color: #0f172a;
+      --accent-color: #2563eb;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-surface);
+      color: var(--primary-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Container Principal */
+    .app-header {
+      padding: 1.25rem 0 0.5rem;
+    }
+
+    .app-title {
+      font-weight: 700;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      color: var(--primary-color);
+    }
+
+    .card-custom {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Formulário Estilizado */
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-control {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.55rem 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--primary-color);
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    /* Área de Preview */
+    .preview-wrapper {
+      background-color: #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      min-height: 480px;
+      max-height: calc(100vh - 140px);
+    }
+
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 2px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      background-color: #ffffff;
+    }
+
+    .btn-action {
+      padding: 0.6rem 1rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary-custom {
+      background-color: var(--primary-color);
+      color: #ffffff;
+      border: none;
+    }
+
+    .btn-primary-custom:hover {
+      background-color: #1e293b;
+      color: #ffffff;
+    }
+
+    .btn-outline-custom {
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-outline-custom:hover {
+      background-color: #f1f5f9;
+      color: var(--primary-color);
+    }
+
+    /* Regras para Impressão em Folha Inteira */
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    @media print {
+      html, body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0 !important;
+        padding: 0 !important;
+        background-color: #ffffff !important;
+        overflow: hidden;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .container-fluid, .row, .col-lg-6, .preview-wrapper, .card-custom {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        background-color: #ffffff !important;
+      }
+      canvas {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        object-fit: contain;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabeçalho -->
+  <header class="app-header no-print">
+    <div class="container-xl text-center">
+      <h1 class="app-title m-0">Gerador de Cartão de Especificação</h1>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="container-xl py-3 flex-grow-1 d-flex flex-column">
+    <div class="row g-4 align-items-stretch flex-grow-1">
+      
+      <!-- Container 1: Formulário -->
+      <div class="col-lg-6 no-print d-flex flex-column">
+        <div class="card-custom p-4">
+          <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+            <h2 class="h5 font-weight-bold m-0" style="font-size: 1.05rem; font-weight: 600;">Parâmetros do Layout</h2>
+            <span class="badge bg-light text-dark border">A4 / Ofício</span>
+          </div>
+
+          <form id="specForm" onsubmit="event.preventDefault();" class="d-flex flex-column justify-content-between flex-grow-1">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="material" class="form-label">Material</label>
+                <input type="text" id="material" class="form-control" value="PARDO" placeholder="Ex: PARDO, BRANCO">
+              </div>
+
+              <div class="col-md-6">
+                <label for="medida" class="form-label">Medida</label>
+                <input type="text" id="medida" class="form-control" value="900 x 900" placeholder="Ex: 900 x 900">
+              </div>
+
+              <div class="col-md-6">
+                <label for="tamanho" class="form-label">Tamanho / Código</label>
+                <input type="text" id="tamanho" class="form-control" value="F" placeholder="Ex: F, M, G">
+              </div>
+
+              <div class="col-md-6">
+                <label for="data" class="form-label">Data</label>
+                <input type="text" id="data" class="form-control" value="____ / ____ / ____" placeholder="__ / __ / ____">
+              </div>
+
+              <div class="col-12">
+                <label for="logoUpload" class="form-label">Logotipo (Substituir padrão)</label>
+                <input type="file" id="logoUpload" class="form-control" accept="image/*">
+              </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="pt-4 border-top mt-4">
+              <div class="row g-2">
+                <div class="col-6">
+                  <button id="btnPrint" type="button" class="btn btn-primary-custom btn-action w-100">
+                    <i class="bi bi-printer"></i> Imprimir Folha
+                  </button>
+                </div>
+                <div class="col-6">
+                  <button id="btnDownload" type="button" class="btn btn-outline-custom btn-action w-100">
+                    <i class="bi bi-download"></i> Baixar PNG
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Container 2: Preview da Folha -->
+      <div class="col-lg-6 col-12 d-flex flex-column">
+        <div class="card-custom p-3">
+          <div class="preview-wrapper">
+            <canvas id="canvas" width="600" height="840"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Elementos de entrada
+    const inputMaterial = document.getElementById('material');
+    const inputMedida = document.getElementById('medida');
+    const inputTamanho = document.getElementById('tamanho');
+    const inputData = document.getElementById('data');
+    const logoUpload = document.getElementById('logoUpload');
+    const btnDownload = document.getElementById('btnDownload');
+    const btnPrint = document.getElementById('btnPrint');
+
+    // Carregamento do Logotipo
+    let customLogo = new Image();
+    
+    // Logo predefinida na raiz
+    customLogo.src = 'logo.png';
+    customLogo.onload = () => render();
+    customLogo.onerror = () => {
+      console.warn('Logo padrão "logo.png" não localizada na raiz. Exibindo indicador temporário.');
+      render();
+    };
+
+    // Função Principal de Renderização no Canvas
+    function render() {
+      const width = canvas.width;
+      const height = canvas.height;
+
+      // 1. Fundo Papel Branco
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, height);
+
+      // 2. Estilo e Tipografia do Layout
+      ctx.fillStyle = '#0F172A';
+      ctx.textAlign = 'center';
+
+      // --- Título MATERIAL ---
+      ctx.font = '700 28px "Inter", sans-serif';
+      ctx.fillText('MATERIAL', width / 2, 90);
+
+      // --- Valor do MATERIAL ---
+      ctx.font = '900 68px "Inter", sans-serif';
+      ctx.fillText(inputMaterial.value.toUpperCase(), width / 2, 165);
+
+      // --- MEDIDA ---
+      ctx.font = '700 64px "Inter", sans-serif';
+      ctx.fillText(inputMedida.value, width / 2, 265);
+
+      // --- TAMANHO / CÓDIGO ---
+      ctx.font = '900 120px "Inter", sans-serif';
+      ctx.fillText(inputTamanho.value.toUpperCase(), width / 2, 420);
+
+      // --- Linha de Data/Campos ---
+      ctx.font = '400 32px "Inter", sans-serif';
+      ctx.fillText(inputData.value, width / 2, 550);
+
+      // --- Renderizar Logo ---
+      if (customLogo.complete && customLogo.naturalWidth !== 0) {
+        const logoWidth = 220;
+        const aspectRatio = customLogo.width / customLogo.height;
+        const logoHeight = logoWidth / aspectRatio;
+        const logoX = (width - logoWidth) / 2;
+        const logoY = 640;
+
+        ctx.drawImage(customLogo, logoX, logoY, logoWidth, logoHeight);
+      } else {
+        // Marcador caso a logo não exista
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = 'italic 18px "Inter", sans-serif';
+        ctx.fillText('[ LOGO DA EMPRESA ]', width / 2, 720);
+      }
+    }
+
+    // Carregar imagem enviada pelo usuário
+    logoUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            customLogo = img;
+            render();
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Atualização em tempo real
+    [inputMaterial, inputMedida, inputTamanho, inputData].forEach(input => {
+      input.addEventListener('input', render);
+    });
+
+    // Ação: Download PNG
+    btnDownload.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = `especificacao-${inputTamanho.value || 'arte'}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Ação: Imprimir
+    btnPrint.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Renderização Inicial
+    render();
+  </script>
+</body>
+</html>
