@@ -14,12 +14,12 @@
   
   <style>
     :root {
-      --bg-surface: #f4f6f9;
+      --bg-surface: #e2e8f0; /* Cinza claro para destacar os cartões */
       --card-bg: #ffffff;
       --primary-color: #0f172a;
       --accent-color: #2563eb;
       --text-muted: #64748b;
-      --border-color: #e2e8f0;
+      --border-color: #cbd5e1;
     }
 
     body {
@@ -31,9 +31,9 @@
       flex-direction: column;
     }
 
-    /* Container Principal */
+    /* Cabeçalho */
     .app-header {
-      padding: 1.25rem 0 0.5rem;
+      padding: 1rem 0 0.5rem;
     }
 
     .app-title {
@@ -43,14 +43,16 @@
       color: var(--primary-color);
     }
 
+    /* Cartões Compactos com Dimensões Idênticas */
     .card-custom {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
-      height: 100%;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+      height: calc(100vh - 90px);
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     /* Formulário Estilizado */
@@ -78,17 +80,18 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
     }
 
-    /* Área de Preview */
+    /* Área de Preview da Folha */
     .preview-wrapper {
-      background-color: #e2e8f0;
+      background-color: #cbd5e1;
       border-radius: 8px;
       padding: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
       flex: 1;
-      min-height: 480px;
-      max-height: calc(100vh - 140px);
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
     }
 
     canvas {
@@ -103,7 +106,7 @@
     }
 
     .btn-action {
-      padding: 0.6rem 1rem;
+      padding: 0.65rem 1rem;
       font-weight: 600;
       font-size: 0.875rem;
       border-radius: 8px;
@@ -154,7 +157,7 @@
       .no-print {
         display: none !important;
       }
-      .container-fluid, .row, .col-lg-6, .preview-wrapper, .card-custom {
+      .container-fluid, .row, [class*="col-"], .preview-wrapper, .card-custom {
         width: 100% !important;
         height: 100% !important;
         max-width: 100% !important;
@@ -182,17 +185,18 @@
 
   <!-- Cabeçalho -->
   <header class="app-header no-print">
-    <div class="container-xl text-center">
-      <h1 class="app-title m-0">Gerador de Cartão de Especificação</h1>
+    <div class="container-fluid px-4 text-center">
+      <h1 class="app-title m-0">Gerador de Chapas</h1>
     </div>
   </header>
 
   <!-- Conteúdo Principal -->
-  <main class="container-xl py-3 flex-grow-1 d-flex flex-column">
-    <div class="row g-4 align-items-stretch flex-grow-1">
+  <main class="container-fluid px-4 pb-3 flex-grow-1">
+    <!-- Linha centralizada com largura das colunas reduzida -->
+    <div class="row g-4 align-items-stretch justify-content-center">
       
-      <!-- Container 1: Formulário -->
-      <div class="col-lg-6 no-print d-flex flex-column">
+      <!-- Container 1: Formulário (Largura reduzida) -->
+      <div class="col-xl-4 col-lg-5 col-md-6 no-print d-flex flex-column">
         <div class="card-custom p-4">
           <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
             <h2 class="h5 font-weight-bold m-0" style="font-size: 1.05rem; font-weight: 600;">Parâmetros do Layout</h2>
@@ -201,22 +205,22 @@
 
           <form id="specForm" onsubmit="event.preventDefault();" class="d-flex flex-column justify-content-between flex-grow-1">
             <div class="row g-3">
-              <div class="col-md-6">
+              <div class="col-6">
                 <label for="material" class="form-label">Material</label>
-                <input type="text" id="material" class="form-control" value="PARDO" placeholder="Ex: PARDO, BRANCO">
+                <input type="text" id="material" class="form-control" value="PARDO" placeholder="Ex: PARDO">
               </div>
 
-              <div class="col-md-6">
+              <div class="col-6">
                 <label for="medida" class="form-label">Medida</label>
                 <input type="text" id="medida" class="form-control" value="900 x 900" placeholder="Ex: 900 x 900">
               </div>
 
-              <div class="col-md-6">
+              <div class="col-6">
                 <label for="tamanho" class="form-label">Tamanho / Código</label>
                 <input type="text" id="tamanho" class="form-control" value="F" placeholder="Ex: F, M, G">
               </div>
 
-              <div class="col-md-6">
+              <div class="col-6">
                 <label for="data" class="form-label">Data</label>
                 <input type="text" id="data" class="form-control" value="____ / ____ / ____" placeholder="__ / __ / ____">
               </div>
@@ -232,7 +236,7 @@
               <div class="row g-2">
                 <div class="col-6">
                   <button id="btnPrint" type="button" class="btn btn-primary-custom btn-action w-100">
-                    <i class="bi bi-printer"></i> Imprimir Folha
+                    <i class="bi bi-printer"></i> Imprimir
                   </button>
                 </div>
                 <div class="col-6">
@@ -246,8 +250,8 @@
         </div>
       </div>
 
-      <!-- Container 2: Preview da Folha -->
-      <div class="col-lg-6 col-12 d-flex flex-column">
+      <!-- Container 2: Preview da Folha (Largura reduzida) -->
+      <div class="col-xl-4 col-lg-5 col-md-6 col-12 d-flex flex-column">
         <div class="card-custom p-3">
           <div class="preview-wrapper">
             <canvas id="canvas" width="600" height="840"></canvas>
