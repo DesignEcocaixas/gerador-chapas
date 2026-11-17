@@ -26,15 +26,15 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-surface);
       color: var(--primary-color);
-      height: 100vh; /* Trava a altura em 100% da tela */
+      height: 100vh;
       margin: 0;
-      overflow: hidden; /* Remove totalmente a barra de rolagem da página */
+      overflow: hidden;
       display: flex;
       flex-direction: column;
     }
 
     .app-header {
-      padding: 1rem 0 0.5rem; /* Menor espaçamento superior */
+      padding: 1rem 0 0.5rem;
     }
 
     .app-title {
@@ -44,10 +44,9 @@
       color: var(--primary-color);
     }
 
-    /* Container principal precisa permitir que os filhos ocupem a altura toda sem estourar */
     main {
       flex: 1;
-      min-height: 0; /* Fundamental para o flexbox não estourar a tela */
+      min-height: 0;
       padding-bottom: 1rem;
     }
 
@@ -58,7 +57,7 @@
       box-shadow: 0 4px 15px -3px rgba(15, 23, 42, 0.05);
       display: flex;
       flex-direction: column;
-      height: 100%; /* Ocupa 100% da linha disponível */
+      height: 100%;
     }
 
     .form-label {
@@ -67,13 +66,13 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
       color: var(--text-muted);
-      margin-bottom: 0.2rem; /* Menos margem sob a label */
+      margin-bottom: 0.2rem;
     }
 
     .form-control, .form-select {
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 0.4rem 0.75rem; /* Inputs levemente mais finos */
+      padding: 0.4rem 0.75rem;
       font-size: 0.85rem;
       font-weight: 500;
       color: var(--primary-color);
@@ -95,12 +94,12 @@
       flex: 1;
       width: 100%;
       height: 100%;
-      min-height: 0; /* Permite encolher dinamicamente */
+      min-height: 0;
     }
 
     canvas {
       max-width: 100%;
-      max-height: 100%; /* Ajusta automaticamente na altura disponível sem empurrar a tela para baixo */
+      max-height: 100%;
       width: auto;
       height: auto;
       object-fit: contain;
@@ -187,19 +186,16 @@
 
   <!-- Conteúdo Principal -->
   <main class="container-fluid px-4">
-    <!-- Removido o gap g-4 para g-3 e h-100 adicionado para esticar a linha -->
     <div class="row g-3 justify-content-center h-100">
       
       <!-- Container 1: Formulário -->
       <div class="col-xl-4 col-lg-5 col-md-6 h-100">
-        <!-- p-3 em vez de p-4 para economizar espaço -->
         <div class="card-custom p-3">
           <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
             <h2 class="h5 font-weight-bold m-0" style="font-size: 1rem; font-weight: 600;">Parâmetros da Chapa</h2>
             <span class="badge bg-light text-dark border">A4 / Ofício</span>
           </div>
 
-          <!-- gap-2 em vez de gap-3 para unir mais os campos e evitar barra de rolagem -->
           <form id="specForm" onsubmit="event.preventDefault();" class="d-flex flex-column gap-2 flex-grow-1 justify-content-between">
             
             <div class="d-flex flex-column gap-2">
@@ -218,17 +214,23 @@
                   <option value="">Selecione o Fornecedor primeiro</option>
                 </select>
               </div>
+              
+              <!-- 3. Novo Campo de Entrada Manual do Modelo -->
+              <div>
+                <label for="modeloInput" class="form-label">MODELO CHAPA</label>
+                <input type="text" id="modeloInput" class="form-control" placeholder="Digite o modelo (Ex: Caixa Pizza)">
+              </div>
 
               <div class="row g-2">
-                <!-- 3. Modelo / Tamanho -->
+                <!-- 4. Código / Tamanho -->
                 <div class="col-6">
-                  <label for="modeloSelect" class="form-label">Modelo / Tamanho</label>
+                  <label for="modeloSelect" class="form-label">MODELOS QUE A CHAPA FAZ</label>
                   <select id="modeloSelect" class="form-select" disabled>
                     <option value="">Aguardando Material</option>
                   </select>
                 </div>
 
-                <!-- 4. Medida -->
+                <!-- 5. Medida -->
                 <div class="col-6">
                   <label for="medida" class="form-label">Medida</label>
                   <input type="text" id="medida" class="form-control" placeholder="Auto-preenchido">
@@ -292,6 +294,7 @@
     const fornecedorSelect = document.getElementById('fornecedorSelect');
     const materialSelect = document.getElementById('materialSelect');
     const modeloSelect = document.getElementById('modeloSelect');
+    const modeloInput = document.getElementById('modeloInput');
     const inputMedida = document.getElementById('medida');
     const inputData = document.getElementById('data');
     const logoUpload = document.getElementById('logoUpload');
@@ -353,7 +356,7 @@
       const f = fornecedorSelect.value;
       const m = materialSelect.value;
       
-      modeloSelect.innerHTML = '<option value="">Selecione o Modelo...</option>';
+      modeloSelect.innerHTML = '<option value="">Selecione o Tamanho/Código...</option>';
       inputMedida.value = '';
 
       if (f && m) {
@@ -409,8 +412,9 @@
 
       const materialText = materialSelect.value || 'MATERIAL';
       const fornText = fornecedorSelect.value || '_________________';
+      const modeloInputText = modeloInput.value || 'CÓDIGO/FACA';
       
-      let modeloText = 'CÓDIGO';
+      let modeloText = 'TAMANHO';
       if(modeloSelect.value !== "") {
          modeloText = chapasData[modeloSelect.value].modelo;
       }
@@ -418,17 +422,34 @@
       const medidaText = inputMedida.value || '____ x ____';
       const dataText = inputData.value || '__/__/____';
 
-      ctx.font = '700 28px "Inter", sans-serif';
-      ctx.fillText('MATERIAL', width / 2, 70);
+      ctx.font = '700 24px "Inter", sans-serif';
+      ctx.fillText('MATERIAL', width / 2, 50);
 
-      ctx.font = '900 68px "Inter", sans-serif';
-      ctx.fillText(materialText.toUpperCase(), width / 2, 140);
+      ctx.font = '900 58px "Inter", sans-serif';
+      ctx.fillText(materialText.toUpperCase(), width / 2, 110);
 
-      ctx.font = '700 64px "Inter", sans-serif';
-      ctx.fillText(medidaText, width / 2, 230);
+      ctx.font = '700 52px "Inter", sans-serif';
+      ctx.fillText(medidaText, width / 2, 185);
 
       // ==========================================
-      // AJUSTE DINÂMICO PARA O TAMANHO DO MODELO
+      // AJUSTE DINÂMICO PARA O NOME DO MODELO/FACA
+      // ==========================================
+      let facaText = modeloInputText.toUpperCase();
+      let facaFontSize = 60; 
+      ctx.font = `900 ${facaFontSize}px "Inter", sans-serif`;
+      
+      let facaTextWidth = ctx.measureText(facaText).width;
+      const maxFacaTextWidth = 540; 
+      
+      if (facaTextWidth > maxFacaTextWidth) {
+        facaFontSize = Math.floor(facaFontSize * (maxFacaTextWidth / facaTextWidth));
+        ctx.font = `900 ${facaFontSize}px "Inter", sans-serif`;
+      }
+      
+      ctx.fillText(facaText, width / 2, 280);
+      
+      // ==========================================
+      // AJUSTE DINÂMICO PARA O TAMANHO/CÓDIGO
       // ==========================================
       let tamanhoText = modeloText.toUpperCase();
       let tamanhoFontSize = 120; 
@@ -442,14 +463,15 @@
         ctx.font = `900 ${tamanhoFontSize}px "Inter", sans-serif`;
       }
       
-      ctx.fillText(tamanhoText, width / 2, 380);
+      ctx.fillText(tamanhoText, width / 2, 400);
+
       // ==========================================
 
       ctx.font = '700 22px "Inter", sans-serif';
-      ctx.fillText('FORNECEDOR', width / 2, 470);
+      ctx.fillText('FORNECEDOR', width / 2, 480);
 
-      ctx.font = '600 36px "Inter", sans-serif';
-      ctx.fillText(fornText.toUpperCase(), width / 2, 510);
+      ctx.font = '600 32px "Inter", sans-serif';
+      ctx.fillText(fornText.toUpperCase(), width / 2, 520);
 
       ctx.font = '400 32px "Inter", sans-serif';
       ctx.fillText(dataText, width / 2, 600);
@@ -459,7 +481,7 @@
         const aspectRatio = customLogo.width / customLogo.height;
         const logoHeight = logoWidth / aspectRatio;
         const logoX = (width - logoWidth) / 2;
-        const logoY = 670; 
+        const logoY = 660; 
         ctx.drawImage(customLogo, logoX, logoY, logoWidth, logoHeight);
       } else {
         ctx.fillStyle = '#94A3B8';
@@ -484,7 +506,7 @@
       }
     });
 
-    [inputMedida].forEach(input => input.addEventListener('input', render));
+    [inputMedida, modeloInput].forEach(input => input.addEventListener('input', render));
 
     btnDownload.addEventListener('click', () => {
       let nomeArquivo = 'arte';
